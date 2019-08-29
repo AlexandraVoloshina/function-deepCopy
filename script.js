@@ -1,22 +1,17 @@
 var a = { d: {c: {a: 2}}, x: 1, y: 2, z: [1, 2, 3], u: undefined, v: null, a: {a: 12, b: 13}};
 
 function deepCopy(a){
-  let b = new Object();
+  let b = Object.create(
+          Object.getPrototypeOf(a), 
+          Object.getOwnPropertyDescriptors(a) 
+    );
+
   for (let [key, value] of Object.entries(a)){
-    if(Array.isArray(value)){
+    if (value instanceof Object){
+      b[key] = deepCopy(value);
+    } else if (Array.isArray(value)){
       b[key] = value.slice();
-    } 
-    else if (value instanceof Object){
-      b[key] = Object.defineProperties({}, Object.getOwnPropertyDescriptors(value));
-      for (let [key1, value1] of Object.entries(value)){
-        if(value1 instanceof Object) {
-          b[key][key1] = Object.defineProperties({}, Object.getOwnPropertyDescriptors(value1));
-        }
-      }     
     }
-    else {
-      b[key] = value;
-    } 
   }
   return b;
 }
